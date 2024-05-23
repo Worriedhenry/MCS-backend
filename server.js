@@ -1,32 +1,48 @@
 const jsonServer = require('json-server');
+const express=require("express")
+const mongoose = require('mongoose');
 const server = jsonServer.create();
-const router = jsonServer.router('db.json');
+// const router = jsonServer.router('db.json');
 const middlewares = jsonServer.defaults();
 const cors = require('cors'); // Import the CORS middleware
-
+require('dotenv').config()
 // Enable CORS for all routes
 server.use(cors());
+mongoose.connect(process.env.MONGODB).then(()=>{
+  console.log("connected to db")
+}).catch(err=>{
+  console.log(err)
+})
 
-// Add custom route to search CAs by name
-server.get('/search/:name', (req, res) => {
-  const searchTerm = req.params.name;
-  const db = router.db.getState();
-  const caData = db.caData.filter((ca) =>
-    ca.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  res.status(200).send(caData[0]);
-});
-server.get('/searchAll', (req, res) => {
-  const db = router.db.getState();
-  const caData=[]
-  db.caData.map((e)=>
-    caData.push(e.name)
-  )
-  res.json(caData);
-});
 
-server.use(middlewares);
-server.use(router);
+// server.use(CookieParser())
+server.use(express.urlencoded({ extended: true }));
+server.use(express.json());
+// const app=express()
+
+var imageup=require('./Controllers/ImageUpload')
+server.use("/",imageup);
+
+var authorisation=require('./Controllers/Authorisation')
+server.use("/",authorisation);
+
+var profile=require('./Controllers/profile')
+server.use("/",profile);
+
+var service=require('./Controllers/service')
+server.use("/",service);
+
+var user=require('./Controllers/user')
+server.use("/",user);
+
+var search=require('./Controllers/Search')
+server.use("/",search);
+
+var proposal=require('./Controllers/proposal')
+server.use("/",proposal);
+
+var review=require('./Controllers/reviews')
+server.use("/",review);
 
 const PORT = 3001;
 server.listen(PORT, () => {
