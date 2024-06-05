@@ -1,50 +1,65 @@
-const jsonServer = require('json-server');
-const express=require("express")
+const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 const mongoose = require('mongoose');
-const server = jsonServer.create();
-// const router = jsonServer.router('db.json');
-const middlewares = jsonServer.defaults();
 const cors = require('cors'); // Import the CORS middleware
-require('dotenv').config()
-// Enable CORS for all routes
-server.use(cors());
-mongoose.connect(process.env.MONGODB).then(()=>{
-  console.log("connected to db")
-}).catch(err=>{
-  console.log(err)
-})
+const socketHandler = require('./utils/socket');
+require('dotenv').config();
 
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+// Enable CORS for all routes
+app.use(cors());
+
+// Initialize socket handling
+socketHandler(io);
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB)
+  .then(() => {
+    console.log('Connected to DB');
+  })
+  .catch(err => {
+    console.log(err);
+  });
 
 // server.use(CookieParser())
-server.use(express.urlencoded({ extended: true }));
-server.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 // const app=express()
 
 var imageup=require('./Controllers/ImageUpload')
-server.use("/",imageup);
+app.use("/",imageup);
 
 var authorisation=require('./Controllers/Authorisation')
-server.use("/",authorisation);
+app.use("/",authorisation);
 
 var profile=require('./Controllers/profile')
-server.use("/",profile);
+app.use("/",profile);
 
 var service=require('./Controllers/service')
-server.use("/",service);
+app.use("/",service);
 
 var user=require('./Controllers/user')
-server.use("/",user);
+app.use("/",user);
 
 var search=require('./Controllers/Search')
-server.use("/",search);
+app.use("/",search);
 
 var proposal=require('./Controllers/proposal')
-server.use("/",proposal);
+app.use("/",proposal);
 
 var review=require('./Controllers/reviews')
-server.use("/",review);
+app.use("/",review);
+
+var { chats }=require('./Controllers/chats')
+app.use("/",chats); 
 
 const PORT = 3001;
 server.listen(PORT, () => {
   console.log(`JSON Server is running on port ${PORT}`);
 });
+
+module.exports.io = io;

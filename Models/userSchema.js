@@ -101,7 +101,7 @@ const userSchema = new Schema({
     },
     socials:{
         type: Array,
-        default: [{title:"Instagram",value:""},{title:"Facebook",value:""},{title:"Twitter",value:""},{title:"LinkedIn",value:""},{title:"Website",value:""}]
+        default: []
     },
     personalSite:{
         type: String,
@@ -122,6 +122,11 @@ const userSchema = new Schema({
     completedProposals: {
         type: Number,
         default: 0
+    },
+    chatRooms:{
+        type: Array,
+        default: [],
+        ref: 'serviceProposal'
     }
 }, { timestamps: true })
 

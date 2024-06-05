@@ -21,6 +21,26 @@ app.get("/user/getservices/:id/:skip/:limit", async (req, res) => {
 
 })
 
+app.get("/user/getrooms/:userId/:page", async (req, res) => {
+    const { userId, page } = req.params;
+    try {
+        const user = await UsersSchema.findById(userId, { chatRooms: 1, _id: 0 }).populate({
+            path: "chatRooms",
+            select: "service serviceProvider client proposalStatus",
+            options: { limit: 10, skip: (parseInt(page) - 1) * 10 },
+            populate: [
+                { path: "service", select: "serviceName serviceStatus" },
+                { path: "serviceProvider", select: "username profilePic" },
+                { path: "client", select: "username profilePic" }
+            ]
+        });
+        return res.status(200).send(user.chatRooms);
+    } catch (err) {
+        console.log(err);
+        return res.status(403).send("invalid token");
+    }
+});
+
 app.get("/user/getabout/:id", async (req, res) => {
     const { id } = req.params
     try{
@@ -115,4 +135,8 @@ app.put("/user/updateprofiletags/:id", async (req, res) => {
         return res.status(403).send("invalid token")
     }
 })
+
+
+
+
 module.exports = app;
