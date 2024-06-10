@@ -30,6 +30,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 // const app=express()
 
+
+app.get("/connection", (req, res) => {
+  res.status(200).send("Connected")
+})
+
+
 var imageup=require('./Controllers/ImageUpload')
 app.use("/",imageup);
 
