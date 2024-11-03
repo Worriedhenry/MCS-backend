@@ -51,8 +51,8 @@ app.use("/",service);
 var user=require('./Controllers/user')
 app.use("/",user);
 
-var search=require('./Controllers/Search')
-app.use("/",search);
+// var search=require('./Controllers/Search')
+// app.use("/",search);
 
 var proposal=require('./Controllers/proposal')
 app.use("/",proposal);
